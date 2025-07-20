@@ -1,0 +1,717 @@
+---
+title: 'STA 5207: Homework 3'
+date: 'Due: Wednesday, September 27 by 11:59 PM'
+output:
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r get-labels, echo = FALSE}
+labs = knitr::all_labels()
+labs = setdiff(labs, c("setup", "get-labels"))
+```
+
+Include your R code as an appendix at the end of your homework. Do not include your code in your answers unless the question explicitly tells you to include your code. Your answers to each exercise should be self-contained without code so that the grader can determine your solution without reading your code or deciphering its output.
+
+## Exercise 1 (Using `lm`) [35 Points]
+
+For this exercise we will use the data stored in `properties.csv` on Canvas. This data was collected by a commercial real estate company to evaluate vacancy rates, rental rates, and operating expenses for commercial properties in a large metropolitan area in order to provide clients with quantitative information upon which to make rental decisions. The data is taken from 81 properties. The variables in the data set are
+
+-   `rental_rate`: rental rate of the property as a percentage.
+-   `age`: age of the property in years.
+-   `tax_rate`: the property's tax rate.
+-   `vacancy_rate`: the property's vacancy rate as a proportion.
+-   `cost`: operating cost in dollars.
+
+1.  (5 points) Fit the following multiple linear regression model. Use `rental_rate` as the response and `age`, `tax_rate`, `vacancy_rate`, and `cost` as the predictors.
+
+    $$
+    Y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \beta_{3} x_{i3} + \beta_4 x_{i4} + \varepsilon_i.
+    $$
+
+    Here,
+
+    -   $Y_i$ is `rental_rate` .
+    -   $x_{i1}$ is `age`.
+    -   $x_{i2}$ is `tax_rate`.
+    -   $x_{i3}$ is `vacancy_rate`.
+    -   $x_{i4}$ is `cost`.
+
+    Use an $F$-test to test the significance of the regression. Report the following:
+
+    -   The null and alternative hypotheses.
+
+    -   The value of the test statistic.
+
+    -   The $p$-value of the test.
+
+    -   A statistical decision at $\alpha = 0.01$.
+
+    -   A conclusion in the context of the problem.
+    
+  Ans: 
+  
+  The null and alternative hypotheses: The absence of statistical significance in the regression model suggests that none of the independent variables—namely, age, tax_rate, vacancy_rate, and cost—have a substantial impact on the rental_rate.
+
+H0: The coefficients (ß1, ß2, ß3, and ß4) for the predictors are all equal to zero.
+
+According to the alternative hypothesis (H1), there is a significant linear relationship between the independent variables and the rental_rate, and at least one of the predictors is statistically significant.
+
+At least one of the coefficients (ßi, where i = 1, 2, 3, 4) must be nonzero.
+
+- The calculated test statistic: The F-test statistic with 4 and 76 degrees of freedom is 26.76.
+
+- The p-value for the test was extremely small, approximately 7.272e-14.
+
+- A statistical decision was made with a significance level (alpha) of 0.01.
+
+  
+
+
+    
+```{r,eval=FALSE,echo=FALSE}
+# Load necessary libraries
+library(readr)
+library(stats)
+
+# Load the properties dataset
+properties <- read.csv("C:/Users/rajitha/Downloads/properties.csv")
+
+# Define the multiple linear regression model
+model <- lm(rental_rate ~ age + tax_rate + vacancy_rate + cost, data = properties)
+
+# Perform the F-test
+f_test_result <- summary(model)
+
+# Extract the F-statistic and p-value
+f_statistic <- f_test_result$fstatistic[1]
+p_value <- pf(f_statistic, df1 = 4, df2 = nrow(properties) - 5, lower.tail = FALSE)
+
+# Significance level (alpha)
+alpha <- 0.01
+
+# Make a statistical decision and report the conclusion
+if (p_value < alpha) {
+  cat("Reject the null hypothesis: The regression model is significant.\n")
+} else {
+  cat("Fail to reject the null hypothesis: The regression model is not significant.\n")
+}
+
+# Print F-statistic and p-value
+cat("F-statistic:", f_statistic, "\n")
+cat("P-value:", p_value, "\n")
+
+# Summary of the regression model
+summary(model)
+
+
+
+``` 
+2.  (4 points) Give the interpretation of $\beta_4$ in the context of the problem.
+Ans: In a multiple linear regression model, β4 represents the coefficient associated with the predictor referred to as "cost."
+
+3.  (8 points) Give the estimated regression equation using all 4 predictors. Give the interpretation of $\hat{\beta}_1$ in the context of the problem.
+Ans: The estimated regression equation can be expressed as follows:
+
+Rental_Rate = 12.2 - 0.14 * Age + 0.28 * Tax_Rate + 0.62 * Vacancy_Rate + 0 * Cost + ε
+
+In this equation, $\hat{\beta}_1$ symbolizes the estimated alteration in the rental rate (the dependent variable) when the age of the commercial property increases by one year, while keeping all other predictor variables (namely, tax_rate, vacancy_rate, and cost) constant.
+
+```{r,eval=FALSE,echo=FALSE}
+#Code for  Question 3
+# Load necessary libraries
+library(readr)
+library(stats)
+
+# Load the properties dataset
+properties <- read.csv("C:/Users/rajitha/Downloads/properties.csv")
+
+# Define the multiple linear regression model
+model <- lm(rental_rate ~ age + tax_rate + vacancy_rate + cost, data = properties)
+
+# Extract the coefficients from the model
+coefficients <- coef(model)
+
+# Estimated regression equation components
+intercept <- coefficients["(Intercept)"]
+beta_age <- coefficients["age"]
+beta_tax_rate <- coefficients["tax_rate"]
+beta_vacancy_rate <- coefficients["vacancy_rate"]
+beta_cost <- coefficients["cost"]
+
+# Display the estimated regression equation
+cat("Estimated Regression Equation:\n")
+cat(
+  paste(
+    "Rental_Rate =", round(intercept, 2),
+    "+", round(beta_age, 2), "Age +",
+    round(beta_tax_rate, 2), "Tax_Rate +",
+    round(beta_vacancy_rate, 2), "Vacancy_Rate +",
+    round(beta_cost, 2), "Cost + ε\n"
+  )
+)
+
+
+
+``` 
+
+4.  (5 points) Conduct a $t$-test at the 5% significance level for $\beta_3$. Give the hypotheses, test statistic, $p$-value, statistical decision, and conclusion in the context of the problem.
+
+Ans: 
+Test Statistic (t-value): 0.5699
+P-value: 0.5704
+Statistical Decision: We do not have enough evidence to reject the null hypothesis.
+Conclusion: Based on the data, it cannot be concluded that there is a significant relationship between vacancy_rate and rental_rate.
+```{r,eval=FALSE,echo=FALSE}
+#Code for  Question 4
+# Fit the multiple linear regression model
+model <- lm(rental_rate ~ age + tax_rate + vacancy_rate + cost, data = properties)
+
+# Perform the t-test for beta3 (vacancy_rate)
+t_test_result <- summary(model)$coefficients["vacancy_rate", c("t value", "Pr(>|t|)")]
+
+# Significance level (alpha)
+alpha <- 0.05
+
+# Hypotheses
+cat("H0: beta3 = 0 (There is no significant relationship between vacancy_rate and rental_rate)\n")
+cat("Ha: beta3 ≠ 0 (There is a significant relationship between vacancy_rate and rental_rate)\n\n")
+
+# Test statistic and p-value
+cat("Test Statistic (t-value):", round(t_test_result["t value"], 4), "\n")
+cat("P-value:", format.pval(t_test_result["Pr(>|t|)"], digits = 4), "\n")
+
+# Statistical decision
+if (abs(t_test_result["t value"]) > alpha) {
+  cat("Statistical Decision: Reject the null hypothesis\n")
+  cat("Conclusion: There is a significant relationship between vacancy_rate and rental_rate.\n")
+} else {
+  cat("Statistical Decision: Fail to reject the null hypothesis\n")
+  cat("Conclusion: There is insufficient evidence to conclude a significant relationship between vacancy_rate and rental_rate.\n")
+}
+
+
+
+
+``` 
+
+5.  (3 points) Report the value of $R^2$ for the model. Interpret its meaning in the context of the problem.
+
+Ans:A larger R-squared (R²) value suggests that a greater portion of the fluctuation in rental rates can be explained by the factors of property age, tax rate, vacancy rate, and operating cost. In this case, approximately 58.47% of the variability in rental rates can be attributed to these variables.
+
+```{r,eval=FALSE,echo=FALSE}
+#Code for  Question 5
+# Fit the multiple linear regression model
+# Fit a linear regression model
+model <- lm(rental_rate ~ age + tax_rate + vacancy_rate + cost, data = properties)
+
+# Extract the R-squared value from the model summary
+rsquared <- summary(model)$r.squared
+
+# Print the R-squared value with 4 decimal places
+cat("R-squared (R²) value:", round(rsquared, 4), "\n")
+
+
+```
+
+6.  (5 points) Report the 90% confidence interval for $\beta_1$. Give an interpretation of the interval in the context of the problem.
+
+Ans:The 90% confidence interval for beta1 represents a range of values where we have a 90% level of confidence that the true population parameter beta1 (which signifies the impact of property age on rental rates) falls. 
+
+Here are the specific values for the 90% confidence interval for beta1 (Age):
+- Lower Limit: -0.1776
+- Upper Limit: -0.1065
+
+
+```{r,eval=FALSE,echo=FALSE}
+# Fit a linear regression model
+model <- lm(rental_rate ~ age + tax_rate + vacancy_rate + cost, data = properties)
+
+# Calculate the 90% confidence interval for beta1 (Age)
+confidence_interval <- confint(model, level = 0.90)
+
+# Display the 90% confidence interval for beta1 (Age)
+cat("90% Confidence Interval for beta1 (Age):\n")
+cat("Lower Bound: ", round(confidence_interval["age", 1], 4), "\n")
+cat("Upper Bound: ", round(confidence_interval["age", 2], 4), "\n")
+
+```
+
+
+7.  (5 points) Use a 99% confidence interval to estimate the mean rental rate of 5 year old properties with a 4.1 tax rate, 0.16 vacancy rate, and an operating cost of \$100,000.
+Ans:Confidence Interval for the Mean Rental Rate of 5-Year-Old Properties at a 99% Confidence Level:
+- Lower Limit: 13.54
+- Estimated Value: 12.71
+- Upper Limit: 14.37
+
+```{r,eval=FALSE,echo=FALSE}
+
+# Define the predictor values for the property of interest
+new_data <- data.frame(age = 5, tax_rate = 4.1, vacancy_rate = 0.16, cost = 100000)
+
+# Fit the multiple linear regression model
+model <- lm(rental_rate ~ age + tax_rate + vacancy_rate + cost, data = properties)
+
+# Predict the rental rate for the property of interest along with a 99% confidence interval
+predicted_rental_rate <- predict(model, newdata = new_data, interval = "confidence", level = 0.99)
+
+# Print the 99% confidence interval
+cat("99% Confidence Interval for Mean Rental Rate of 5-Year-Old Property:\n")
+cat("Lower Bound:", round(predicted_rental_rate[1], 2), "\n")
+cat("Point Estimate:", round(predicted_rental_rate[2], 2), "\n")
+cat("Upper Bound:", round(predicted_rental_rate[3], 2), "\n")
+
+
+
+```
+
+
+8.  (5 points) Give a 99% prediction interval for a single property with the predictor values given in part (7).
+Ans: Prediction Interval for an Individual Property at a 99% Confidence Level:
+Minimum Estimate: 13.54
+Estimated Value: 10.42
+Maximum Estimate: 16.65
+
+```{r,eval=FALSE,echo=FALSE}
+# Define the predictor values for the property of interest
+new_data <- data.frame(age = 5, tax_rate = 4.1, vacancy_rate = 0.16, cost = 100000)
+
+# Fit a multiple linear regression model
+model <- lm(rental_rate ~ age + tax_rate + vacancy_rate + cost, data = properties)
+
+# Predict the rental rate for the property of interest with a 99% prediction interval
+predicted_rental_rate <- predict(model, newdata = new_data, interval = "prediction", level = 0.99)
+
+# Print the 99% prediction interval
+cat("99% Prediction Interval for a Single Property:\n")
+cat("Lower Bound:", round(predicted_rental_rate[1], 2), "\n")
+cat("Point Estimate:", round(predicted_rental_rate[2], 2), "\n")
+cat("Upper Bound:", round(predicted_rental_rate[3], 2), "\n")
+
+
+```
+ 
+
+## Exercise 2 (The $F$-test vs. The $t$-test) [35 Points]
+
+For this exercise we will use the `sat` data set from the `faraway` package. To load the data set in `R`, run `data(sat, package='faraway')`. You can also find the data in `sat.csv` on Canvas. The data was collected to study the relationship between expenditures on public education and test results during the 1994 - 1995 school year. The data set contains the following predictors:
+
+-   `expend`: Current expenditure per pupil (in thousands of dollars).
+-   `ratio`: Average pupil to teacher ratio.
+-   `salary`: Estimated average annual salary of teachers.
+-   `takers`: Percentage of eligible students taking the SAT.
+-   `verbal` Average verbal SAT score.
+-   `math`: Average math SAT score.
+-   `total`: Average total score on the SAT.
+
+1.  (8 points) Fit the following multiple linear regression model. Use `total` as the response and `expend`, `salary`, and `ratio` as predictors.
+
+    $$
+    Y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \beta_3 x_{i3} + \varepsilon_i
+    $$
+
+    Here,
+
+    -   $Y_i$ is `total`.
+    -   $x_{i1}$ is `expend`.
+    -   $x_{i2}$ is `salary`.
+    -   $x_{i3}$ is `ratio`.
+
+    Use an $F$-test to test the significance of the regression. Report the following:
+
+    -   The null and alternative hypotheses.
+    -   The value of the test statistic.
+    -   The $p$-value of the test.
+    -   A statistical decision at $\alpha = 0.05$.
+    -   A conclusion in the context of the problem.
+  
+  Ans:
+
+F-statistic: 4.0662 
+P-value: 0.01209 
+Statistical Decision: Reject the null hypothesis
+    ```{r,eval=FALSE,echo=FALSE}
+##Code for  Question 1
+# Load the required library and dataset
+library(faraway)
+data(sat, package = 'faraway')
+
+# Fit a linear regression model
+model <- lm(total ~ expend + salary + ratio, data = sat)
+
+# Get the F-statistic and p-value from the model summary
+f_test_result <- summary(model)
+f_statistic <- f_test_result$fstatistic[1]
+p_value <- pf(f_statistic, df1 = 3, df2 = nrow(sat) - 4, lower.tail = FALSE)
+
+# Set the significance level (alpha)
+alpha <- 0.05
+
+# Define null and alternative hypotheses
+cat("Null Hypothesis (H0): The regression model is not significant (all βi's are zero).\n")
+cat("Alternative Hypothesis (H1): The regression model is significant (at least one βi is not zero).\n\n")
+
+# Print the F-statistic and p-value
+cat("F-statistic:", round(f_statistic, 4), "\n")
+cat("P-value:", format.pval(p_value, digits = 4), "\n")
+
+# Make a statistical decision and provide a conclusion
+if (p_value < alpha) {
+  cat("Statistical Decision: Reject the null hypothesis\n")
+  cat("Conclusion: The regression model is significant. At least one of the predictors (expend, salary, or ratio) significantly affects the total SAT score.\n")
+} else {
+  cat("Statistical Decision: Fail to reject the null hypothesis\n")
+  cat("Conclusion: There is insufficient evidence to conclude that the regression model is significant in predicting the total SAT score.\n")
+}
+
+
+``` 
+
+2.  (12 points) Conduct a $t$-test at the 5% significance level for each slope parameter ($\beta_1, \beta_2, \beta_2$). Give the hypotheses, test statistics, $p$-values, statistical decision, and conclusions in the context of the problem for each test.
+Ans:
+Coefficient Estimate ( expend ): 16.4689 
+Standard Error (SE): 22.0499 
+Test Statistic (t-value): 0.7469 
+P-value: 0.4589 
+Statistical Decision: Fail to reject the null hypothesis
+Conclusion: There is insufficient evidence to conclude a significant relationship between expend and total.
+
+
+Coefficient Estimate ( salary ): -8.8226 
+Standard Error (SE): 4.6968 
+Test Statistic (t-value): -1.8784 
+P-value: 0.06667 
+Statistical Decision: Fail to reject the null hypothesis
+Conclusion: There is insufficient evidence to conclude a significant relationship between salary and total.
+
+Coefficient Estimate ( ratio ): 6.3303 
+Standard Error (SE): 6.5421 
+Test Statistic (t-value): 0.9676 
+P-value: 0.3383 
+Statistical Decision: Fail to reject the null hypothesis
+Conclusion: There is insufficient evidence to conclude a significant relationship between ratio and total.
+
+```{r,eval=FALSE,echo=FALSE}
+##Code for  Question 2
+# Fit the multiple linear regression model
+# Fit a linear model
+model <- lm(total ~ expend + salary + ratio, data = sat)
+
+# Set the significance level (alpha)
+alpha <- 0.05
+
+# Function to perform t-test, print results, and return conclusion
+perform_t_test <- function(coef_name, coef_index) {
+  # Perform t-test for the specified coefficient
+  t_test_result <- summary(model)$coefficients[coef_index, c("Estimate", "Std. Error", "t value", "Pr(>|t|)")]
+  
+  # Null and alternative hypotheses
+  cat(paste("For", coef_name, ":\n"))
+  cat("H0:", coef_name, "= 0 (There is no significant relationship)\n")
+  cat("Ha:", coef_name, "!= 0 (There is a significant relationship)\n\n")
+  
+  # Test statistic and p-value
+  cat(paste("Coefficient Estimate (", coef_name, "):", round(t_test_result["Estimate"], 4), "\n"))
+  cat(paste("Standard Error (SE):", round(t_test_result["Std. Error"], 4), "\n"))
+  cat(paste("Test Statistic (t-value):", round(t_test_result["t value"], 4), "\n"))
+  cat(paste("P-value:", format.pval(t_test_result["Pr(>|t|)"], digits = 4), "\n"))
+  
+  # Statistical decision
+  if (t_test_result["Pr(>|t|)"] < alpha) {
+    cat("Statistical Decision: Reject the null hypothesis\n")
+    cat("Conclusion: There is a significant relationship between", coef_name, "and total.\n\n")
+  } else {
+    cat("Statistical Decision: Fail to reject the null hypothesis\n")
+    cat("Conclusion: There is insufficient evidence to conclude a significant relationship between", coef_name, "and total.\n\n")
+  }
+}
+
+# Perform t-tests for each coefficient
+perform_t_test("expend", "expend")
+perform_t_test("salary", "salary")
+perform_t_test("ratio",
+
+
+``` 
+
+3.  (3 points) Based on your answers to questions 1 and 2, do any of these predictors have a linear relationship with the response?
+
+Ans: 
+For the problem mentioned above, if any of these tests show statistical significance, it suggests that there is supporting evidence for a linear connection between each predictor and the total SAT score. However, if none of the tests demonstrate significance, we would have to analyze the p-values derived from both the F-test and individual t-tests for each predictor. This analysis will help us ascertain which, if any, of the predictors exhibit a linear relationship with the "total" response variable in the provided regression model.
+
+
+4.  (12 points) Perform **simple** **linear regression** with `total` as the response and `expend` as the predictor. Conduct a $t$-test at the 5% significance level. Give the test statistic, $p$-value, and statistical decision. Does the conclusion (reject or not) match the result of the test in question 2?
+ -   `salary` as the predictor. Conduct a $t$-test at the 5% significance level. Give the test statistic, $p$-value, and statistical decision. Does the conclusion (reject or not) match the result of the test in question 2?
+
+    -   `ratio` as the predictor. Conduct a $t$-test at the 5% significance level. Give the test statistic, $p$-value, and statistical decision. Does the conclusion (reject or not) match the result of the test in question 2?
+    
+Ans:
+For expend:
+Coefficient Estimate (expend): -20.8922 
+Standard Error (SE): 7.3282 
+Test Statistic (t-value): -2.8509 
+P-value: 0.006408 
+Statistical Decision: Reject the null hypothesis
+Conclusion: There is a significant relationship between expend and total.
+
+For Salary:
+Coefficient Estimate (salary): -5.5396 
+Standard Error (SE): 1.6324 
+Test Statistic (t-value): -3.3936 
+P-value: 0.001391 
+Statistical Decision: Reject the null hypothesis
+Conclusion: There is a significant relationship between salary and total.
+
+For ratio:
+Coefficient Estimate (ratio): 2.6825 
+Standard Error (SE): 4.7493 
+Test Statistic (t-value): 0.5648 
+    
+```{r,eval=FALSE,echo=FALSE}
+##Code for  Question 4
+#SLR with expend as predictor
+# Fit simple linear regression with expend as the predictor
+# Function for conducting t-test and generating results
+t_test_and_conclusion <- function(model, predictor_name, alpha = 0.05) {
+  # Perform t-test for the coefficient of the predictor
+  t_test_result <- summary(model)$coefficients[predictor_name, c("Estimate", "Std. Error", "t value", "Pr(>|t|)")]
+  
+  # Null and alternative hypotheses
+  cat("For", predictor_name, ":\n")
+  cat("H0: beta_", predictor_name, " = 0 (There is no significant relationship between", predictor_name, "and total)\n")
+  cat("Ha: beta_", predictor_name, " ≠ 0 (There is a significant relationship between", predictor_name, "and total)\n\n")
+  
+  # Test statistic and p-value
+  cat("Coefficient Estimate (", predictor_name, "):", round(t_test_result["Estimate"], 4), "\n")
+  cat("Standard Error (SE):", round(t_test_result["Std. Error"], 4), "\n")
+  cat("Test Statistic (t-value):", round(t_test_result["t value"], 4), "\n")
+  cat("P-value:", format.pval(t_test_result["Pr(>|t|)"], digits = 4), "\n")
+  
+  # Statistical decision
+  if (t_test_result["Pr(>|t|)"] < alpha) {
+    cat("Statistical Decision: Reject the null hypothesis\n")
+    cat("Conclusion: There is a significant relationship between", predictor_name, "and total.\n\n")
+  } else {
+    cat("Statistical Decision: Fail to reject the null hypothesis\n")
+    cat("Conclusion: There is insufficient evidence to conclude a significant relationship between", predictor_name, "and total.\n\n")
+  }
+}
+
+# Simple linear regression for 'expend' predictor
+model_expend <- lm(total ~ expend, data = sat)
+t_test_and_conclusion(model_expend, "expend")
+
+# Simple linear regression for 'salary' predictor
+model_salary <- lm(total ~ salary, data = sat)
+t_test_and_conclusion(model_salary, "salary")
+
+# Simple linear regression for 'ratio' predictor
+model_ratio <- lm(total ~ ratio, data = sat)
+t_test_and_conclusion(model_ratio, "ratio")
+
+
+
+``` 
+
+   
+
+## Exercise 3 (The $F$-test for Model Comparison) [30 Points]
+
+For this exercise we will use data stored in `goalies_subset.csv` on Canvas. This data is a subset of the `goalies.csv` data set you analyzed in Homework 1. It contains career data for 462 players in the National Hockey League who played goaltender at some point up to and including the 2014-2015 season. The variables in the data set are:
+
+-   `W`: Wins
+-   `GA`: Goals Against
+-   `SA`: Shots Against
+-   `SV`: Saves
+-   `SV_PCT`: Save Percentages
+-   `GAA`: Goals Against Average
+-   `SO`: Shutouts
+-   `MIN`: Minutes
+-   `PIM`: Penalties in Minutes
+
+For this exercise, we will consider three models, each with Wins as the response. The predictors for these models are
+
+-   **Model 1:** Goals Against, Saves
+-   **Model 2**: Goals Against, Saves, Shots Against, Minutes, Shutouts
+-   **Model 3**: All Predictors.
+
+1.  (10 points) Use an $F$-test to compare Model 1 and Model 2. Report the following:
+    -   The null hypothesis.
+
+    -   $\mathsf{SSE_F}$, $\mathsf{SSE_R}$, and their associated degrees of freedom.
+
+    -   The value of the test statistic. Also show how the test statistic is computed using the sum of squared errors numerically.
+    
+    -   The $p$-value of the test.
+
+    -   A statistical decision at $\alpha = 0.05$.
+
+    -   The model you prefer.
+  
+Ans: 
+Null Hypothesis
+SSEF: 294756.6 
+SSER: 72898.59
+DFE: NA 
+DFR: 3 
+F-statistic: Null
+p-value: 6.808247e-138 
+Reject the null hypothesis. Model 2 is preferred.
+
+    
+    ```{r,eval=FALSE,echo=FALSE}
+##Code for  Question 1
+# Load the goalies_subset dataset
+goalies_subset <- read.csv("C:/Users/rajitha/Downloads/goalies_subset.csv")
+
+# Define Model 1 with Goals Against (GA) and Saves (SV) as predictors
+model1 <- lm(W ~ GA + SV, data = goalies_subset)
+
+# Define Model 2 with additional predictors
+model2 <- lm(W ~ GA + SV + SA + MIN + SO, data = goalies_subset)
+
+# Perform ANOVA to compare the two models
+anova_result <- anova(model1, model2)
+
+# Extract relevant information from the ANOVA result
+SSEF <- sum(model1$residuals^2)
+SSER <- sum(model2$residuals^2)
+DFE <- anova_result[1, "Df"]
+DFR <- anova_result[2, "Df"]
+F_statistic <- anova_result[2, "F value"]  # F-statistic from ANOVA
+p_value <- anova_result[2, "Pr(>F)"]       # p-value from ANOVA
+
+# Print the results
+cat("SSEF:", SSEF, "\n")
+cat("SSER:", SSER, "\n")
+cat("DFE:", DFE, "\n")
+cat("DFR:", DFR, "\n")
+cat("F-statistic:", F_statistic, "\n")
+cat("p-value:", p_value, "\n")
+
+# Make a statistical decision
+alpha <- 0.05
+if (p_value < alpha) {
+  cat("Reject the null hypothesis. Model 2 is preferred.\n")
+} else {
+  cat("Fail to reject the null hypothesis. Model 1 is sufficient.\n")
+}
+
+# Display the F-statistic
+F_statistic
+
+``` 
+    
+2.  (10 points) Use an $F$-test to compare Model 3 to your preferred model from part (1). Report the following:
+    -   The null hypothesis.
+
+      -   $\mathsf{SSE_F}$, $\mathsf{SSE_R}$, and their associated degrees of freedom.
+
+    -   The value of the test statistic. Also show how the test statistic is computed using the sum of squared errors numerically.
+
+    -   The $p$-value of the test.
+
+    -   A statistical decision at $\alpha = 0.05$.
+
+    -   The model you prefer.
+    
+  Ans:
+SSEF_2: 294756.6 
+SSER_2: 70993.54 
+DFE_2: NA 
+DFR_2: 6 
+F-statistic_2: Null 
+p-value_2: 1.39403e-136 
+Reject the null hypothesis. Model 3 is preferred.
+    ```{r,eval=FALSE,echo=FALSE}
+##Code for  Question 2
+    # Define Model 3 with all predictors
+ # Fit Model 3
+model3 <- lm(W ~ GA + SA + SV + SV_PCT + GAA + SO + MIN + PIM, data = goalies_subset)
+
+# Perform ANOVA to compare Model 3 to the preferred model (Model 1)
+anova_result <- anova(model1, model3)
+
+# Extract relevant information from the ANOVA result
+SSE_Model1 <- sum(model1$residuals^2)  # Sum of squared errors for Model 1 (preferred model)
+SSE_Model3 <- sum(model3$residuals^2)  # Sum of squared errors for Model 3
+DFE_Model1 <- anova_result[1, "Df"]    # Degrees of freedom for Model 1
+DFR_Model3 <- anova_result[2, "Df"]    # Degrees of freedom for Model 3
+F_statistic <- anova_result[2, "F value"]  # F-statistic from ANOVA
+p_value <- anova_result[2, "Pr(>F)"]       # p-value from ANOVA
+
+# Print the results
+cat("Sum of Squared Errors (SSE) for Model 1:", SSE_Model1, "\n")
+cat("Sum of Squared Errors (SSE) for Model 3:", SSE_Model3, "\n")
+cat("Degrees of Freedom (DF) for Model 1:", DFE_Model1, "\n")
+cat("Degrees of Freedom (DF) for Model 3:", DFR_Model3, "\n")
+cat("F-statistic:", F_statistic, "\n")
+cat("p-value:", p_value, "\n")
+
+# Make a statistical decision
+alpha <- 0.05
+if (p_value < alpha) {
+  cat("Reject the null hypothesis. Model 3 is preferred.\n")
+} else {
+  cat("Fail to reject the null hypothesis. The preferred model from part 1 is sufficient.\n")
+}
+
+``` 
+    
+3.  (10 points) Use a $t$-test to test $H_0: \beta_{\texttt{SV}} = 0$ vs $H_1 : \beta_{\texttt{SV}} \neq 0$ for the model you preferred in part (2). Report the following:
+    -   The value of the test statistic.
+
+    -   The $p$-value of the test.
+
+    -   A statistical decision at $\alpha = 0.05$.
+  
+Ans:
+Residual standard error: 12.52 on 453 degrees of freedom
+Multiple R-squared:  0.9858,	Adjusted R-squared:  0.9856 
+F-statistic:  3938 on 8 and 453 DF,  p-value: < 2.2e-16
+
+t-statistic: -3.857739 
+p-value: 0.0001310371 
+Reject the null hypothesis. Beta_SV is significantly different from zero.
+    
+    ```{r,eval=FALSE,echo=FALSE}
+##Code for  Question 3
+# Summarize the linear regression model (model3)
+summary(model3)
+
+# Extract the coefficient and standard error for "SV"
+beta_SV <- coef(model3)["SV"]
+se_SV <- sqrt(vcov(model3)["SV", "SV"])
+
+# Calculate the t-statistic
+t_statistic <- beta_SV / se_SV
+
+# Calculate the degrees of freedom
+df <- df.residual(model3)
+
+# Calculate the two-tailed p-value
+p_value <- 2 * (1 - pt(abs(t_statistic), df))
+
+# Print the results
+cat("T-Statistic:", t_statistic, "\n")
+cat("P-Value:", p_value, "\n")
+
+# Make a statistical decision
+alpha <- 0.05
+if (p_value < alpha) {
+  cat("Statistical Decision: Reject the null hypothesis.\n")
+  cat("Conclusion: Beta_SV is significantly different from zero.\n")
+} else {
+  cat("Statistical Decision: Fail to reject the null hypothesis.\n")
+  cat("Conclusion: Beta_SV is not significantly different from zero.\n")
+}
+
+
+## Code Appendix
+
+```{r all-code, ref.label=labs, eval=FALSE}
+```
